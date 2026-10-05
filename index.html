@@ -202,7 +202,7 @@ $("form").addEventListener("submit",async e=>{
 
   function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
   async function load(){
-    const {data:v,error:ve}=await client.from('veiculos').select('*').eq('id',publicId).eq('status','ativo').single();
+    const {data:v,error:ve}=await client.from('veiculos').select('id,marca,modelo,versao,ano_fabricacao,ano_modelo,quilometragem,preco,combustivel,cambio,cor,descricao,destaque,whatsapp,status,created_at').eq('id',publicId).eq('status','ativo').single();
     if(ve || !v){
       document.getElementById('publicContent').innerHTML='<div class="public-error">Anúncio não encontrado ou não está mais ativo.</div>';
       return;
@@ -375,7 +375,7 @@ $("form").addEventListener("submit",async e=>{
 <div class="field"><label>Câmbio</label><select id="vCambio"><option value="">Selecione</option><option>Automático</option><option>Manual</option><option>CVT</option><option>Automatizado</option></select></div>
 </div></div>
 <div class="form-section"><div class="form-section-title">Venda e anúncio</div><div class="form-grid">
-<div class="field"><label>WhatsApp</label><input id="vWhatsapp" placeholder="Ex.: 34998779808"><span class="field-hint">DDD + número, somente dígitos.</span></div><div class="field"><label>Destaque</label><input id="vDestaque" placeholder="Ex.: Todas as revisões na concessionária"></div>
+<div class="field"><label>WhatsApp</label><input id="vWhatsapp" placeholder="Ex.: 34998779808"><span class="field-hint">DDD + número, somente dígitos.</span></div><div class="field"><label>Placa <span style="color:#c99a52;font-size:11px;">• INTERNO</span></label><input id="vPlaca" placeholder="Ex.: ABC1D23" maxlength="8" autocomplete="off" style="text-transform:uppercase"><span class="field-hint">Uso exclusivo seu. Não aparece em anúncios, arte ou página pública.</span></div><div class="field"><label>Destaque</label><input id="vDestaque" placeholder="Ex.: Todas as revisões na concessionária"></div>
 <div class="field full">
 <label>Descrição</label>
 <div class="desc-tools">
@@ -627,7 +627,7 @@ $("form").addEventListener("submit",async e=>{
    $('vFab').value=v.ano_fabricacao??''; $('vMod').value=v.ano_modelo??'';
    $('vKm').value=v.quilometragem??''; $('vPreco').value=v.preco??'';
    $('vComb').value=v.combustivel||''; $('vCambio').value=v.cambio||''; $('vCor').value=v.cor||'';
-   $('vWhatsapp').value=v.whatsapp||''; $('vDestaque').value=v.destaque||''; $('vDescricao').value=v.descricao||'';
+   $('vWhatsapp').value=v.whatsapp||''; $('vPlaca').value=(v.placa||'').toUpperCase(); $('vDestaque').value=v.destaque||''; $('vDescricao').value=v.descricao||'';
    $('saveVehicleBtn').textContent='Salvar alterações';
    $('vehicleMsg').style.display='none';
  }
@@ -998,3 +998,312 @@ $("form").addEventListener("submit",async e=>{
          const len=$('instagramCaptionPreview').value.length;
          $('instagramCaptionCount').textContent=`${len}/2200`;
          $('instagramCaptionCount').style.color=len>2200?'#ff8a8a':'#777';
+       };
+
+       $('artPreviewBox').style.display='block';
+       $('downloadArtBtn').style.display='inline-block';
+       $('publishInstagramBtn').style.display='inline-block';
+       $('artMsg').className='msg ok';$('artMsg').textContent=`Arte gerada e legenda pronta com ${Math.min((photos||[]).length,10)} foto(s).`;$('artMsg').style.display='block';
+
+       $('publishInstagramBtn').onclick=async()=>{
+         const btn=$('publishInstagramBtn');
+         const oldText=btn.textContent;
+         btn.disabled=true;
+         btn.textContent='Publicando...';
+         $('artMsg').className='msg';
+         $('artMsg').textContent=`Preparando carrossel com ${Math.min((photos||[]).length,10)} fotos e enviando para o Instagram...`;
+         $('artMsg').style.display='block';
+         try{
+           const {data:{session}}=await window.zClient.auth.getSession();
+           if(!session?.access_token) throw new Error('Sua sessão expirou. Faça login novamente.');
+
+           const {data:{user}}=await window.zClient.auth.getUser();
+           if(!user) throw new Error('Usuário não autenticado.');
+
+           const blob=await new Promise((resolve,reject)=>{
+             canvas.toBlob(b=>b?resolve(b):reject(new Error('Não foi possível gerar o PNG.')),'image/png');
+           });
+
+           const path=`${user.id}/${vehicleId}/instagram-${Date.now()}.png`;
+           const {error:uploadError}=await window.zClient.storage.from('veiculos').upload(
+             path,blob,{contentType:'image/png',upsert:false}
+           );
+           if(uploadError) throw uploadError;
+
+           const {data:pub}=window.zClient.storage.from('veiculos').getPublicUrl(path);
+           const imageUrl=pub?.publicUrl;
+           if(!imageUrl) throw new Error('Não foi possível obter a URL pública da arte.');
+
+           const caption=$('instagramCaptionPreview').value.trim();
+           if(!caption) throw new Error('A legenda do Instagram está vazia.');
+           if(caption.length>2200) throw new Error('A legenda ultrapassa 2.200 caracteres. Reduza o texto antes de publicar.');
+
+           const response=await fetch('https://lutsmfywwosgdgerqdwt.supabase.co/functions/v1/instagram-publicar',{
+             method:'POST',
+             headers:{
+               'Content-Type':'application/json',
+               'Authorization':`Bearer ${session.access_token}`
+             },
+             body:JSON.stringify({
+               veiculo_id:vehicleId,
+               image_url:imageUrl,
+               image_urls:(photos||[]).slice(0,10).map(p=>p.url).filter(Boolean),
+               caption
+             })
+           });
+
+           const result=await response.json().catch(()=>({}));
+           if(!response.ok) throw new Error(result.error||'O Instagram recusou a publicação.');
+
+           $('artMsg').className='msg ok';
+           $('artMsg').textContent='Carrossel publicado no Instagram com sucesso! 🔥';
+           $('artMsg').style.display='block';
+           btn.textContent='Publicado ✓';
+         }catch(err){
+           console.error('Erro ao publicar no Instagram:',err);
+           $('artMsg').className='msg error';
+           $('artMsg').textContent='Não foi possível publicar: '+(err.message||'erro desconhecido');
+           $('artMsg').style.display='block';
+           btn.disabled=false;
+           btn.textContent=oldText;
+         }
+       };
+
+       $('downloadArtBtn').onclick=()=>{
+         const a=document.createElement('a');a.download=`zezones-${(v.marca||'veiculo')+'-'+(v.modelo||'').replace(/\s+/g,'-')}-${story?'9x16':'1x1'}.png`;a.href=canvas.toDataURL('image/png');a.click();
+       };
+     };
+     logo.src=ZEZONES_LOGO;
+   };
+   img.onerror=()=>alert('Não foi possível carregar a foto principal.');
+   img.src=photo.url;
+ }
+
+ $('artBtn').addEventListener('click',openArtPanel);
+ $('closeArtBtn').addEventListener('click',()=>{ $('artPanel').style.display='none'; });
+ $('closeDetailBtn').addEventListener('click',()=>{$('vehicleDetailPanel').style.display='none';});
+ $('artVehicleSelect').addEventListener('change',()=>{ $('artPreviewBox').style.display='none';$('downloadArtBtn').style.display='none';$('publishInstagramBtn').style.display='none';$('publishInstagramBtn').disabled=false;$('publishInstagramBtn').textContent='📸 Publicar no Instagram';$('artMsg').style.display='none'; });
+ $('generateArtBtn').addEventListener('click',generateArt);
+
+ $('cancelVehicleBtn').addEventListener('click',()=>{$('vehicleForm').reset();editingVehicleId=null;window.__zezonesDescVariant=0;$('saveVehicleBtn').textContent='Salvar veículo';$('vehiclePanel').style.display='none';$('vehicleMsg').style.display='none';});
+
+ function buildDescription(variant=0){
+   const marca=$('vMarca').value.trim(), modelo=$('vModelo').value.trim(), versao=$('vVersao').value.trim();
+   const fab=$('vFab').value.trim(), mod=$('vMod').value.trim(), km=$('vKm').value.trim();
+   const comb=$('vComb').value.trim(), cambio=$('vCambio').value.trim(), cor=$('vCor').value.trim();
+   const destaque=$('vDestaque').value.trim();
+   const nome=[marca,modelo,versao].filter(Boolean).join(' ');
+   const ano=(fab||mod)?((fab&&mod)?fab+'/'+mod:(fab||mod)):'';
+   const partes=[];
+   if(nome) partes.push(nome);
+   if(ano) partes.push(ano);
+   if(km) partes.push(Number(km).toLocaleString('pt-BR')+' km');
+   if(comb) partes.push(comb.toLowerCase());
+   if(cambio) partes.push('câmbio '+cambio.toLowerCase());
+   if(cor) partes.push('na cor '+cor.toLowerCase());
+   const base=partes.join(', ');
+   const frases=[
+     `${base||'Veículo'} em excelente estado de conservação${destaque?', '+destaque.toLowerCase():''}. Modelo com ótimo conjunto mecânico, conforto e excelente apresentação. Consulte condições e disponibilidade.`,
+     `Apresentamos ${base||'este veículo'}${destaque?'. '+destaque+'.':''} Um carro que combina conforto, desempenho e bom nível de equipamentos. Entre em contato para mais informações.`,
+     `${base||'Veículo'} muito bem apresentado${destaque?`, com destaque para ${destaque.toLowerCase()}`:''}. Uma ótima opção para quem procura qualidade, conforto e segurança. Fale conosco para conhecer todos os detalhes.`
+   ];
+   return frases[variant%frases.length];
+ }
+ function generateDescription(variant=0){
+   $('vDescricao').value=buildDescription(variant);
+   $('vDescricao').focus();
+ }
+ $('generateDescBtn').addEventListener('click',()=>generateDescription(0));
+ $('regenerateDescBtn').addEventListener('click',()=>{
+   const current=window.__zezonesDescVariant||0;
+   window.__zezonesDescVariant=(current+1)%3;
+   generateDescription(window.__zezonesDescVariant);
+ });
+ $('clearDescBtn').addEventListener('click',()=>{
+   $('vDescricao').value='';
+   $('vDescricao').focus();
+ });
+
+
+ function getAdData(){
+   const marca=$('vMarca').value.trim(), modelo=$('vModelo').value.trim(), versao=$('vVersao').value.trim();
+   const fab=$('vFab').value.trim(), mod=$('vMod').value.trim(), km=$('vKm').value.trim();
+   const preco=$('vPreco').value.trim(), comb=$('vComb').value.trim(), cambio=$('vCambio').value.trim();
+   const cor=$('vCor').value.trim(), destaque=$('vDestaque').value.trim(), desc=$('vDescricao').value.trim();
+   const nome=[marca,modelo,versao].filter(Boolean).join(' ');
+   const ano=(fab&&mod)?`${fab}/${mod}`:(fab||mod||'');
+   const kmFmt=km?Number(km).toLocaleString('pt-BR')+' km':'';
+   let precoFmt='';
+   if(preco){
+     const n=Number(String(preco).replace(/\D/g,''));
+     if(!isNaN(n)&&n) precoFmt=n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+   }
+   const opts=[...document.querySelectorAll('.basic-opt:checked')].map(x=>x.value);
+   const outros=$('vOutrosOpcionais').value.trim();
+   if(outros) opts.push(outros);
+   return {marca,modelo,versao,ano,kmFmt,precoFmt,comb,cambio,cor,destaque,desc,nome,opts};
+ }
+
+ function buildAd(mode){
+   const d=getAdData();
+   const title=d.nome || 'VEÍCULO';
+   const specs=[
+     d.ano ? `Ano: ${d.ano}` : '',
+     d.kmFmt ? `Quilometragem: ${d.kmFmt}` : '',
+     d.comb ? `Combustível: ${d.comb}` : '',
+     d.cambio ? `Câmbio: ${d.cambio}` : '',
+     d.cor ? `Cor: ${d.cor}` : ''
+   ].filter(Boolean);
+   const opts=d.opts;
+   if(mode==='whatsapp'){
+     return [
+       `🚗 ${title}`,
+       [d.ano,d.kmFmt].filter(Boolean).join(' • '),
+       d.precoFmt ? `💰 ${d.precoFmt}` : '',
+       d.destaque ? `⭐ ${d.destaque}` : '',
+       opts.length ? `\n${opts.map(x=>`• ${x}`).join('\n')}` : '',
+       d.desc ? `\n${d.desc}` : '',
+       '\n📲 Me chama no WhatsApp para mais informações, troca e financiamento.'
+     ].filter(Boolean).join('\n');
+   }
+   if(mode==='social'){
+     return [
+       `✨ ${title}`,
+       [d.ano,d.kmFmt].filter(Boolean).join(' • '),
+       d.precoFmt ? `💰 ${d.precoFmt}` : '',
+       '',
+       d.destaque ? `⭐ ${d.destaque}` : '',
+       opts.length ? '\n' + opts.map(x=>`• ${x}`).join('\n') : '',
+       d.desc ? `\n${d.desc}` : '',
+       '\n📲 Consulte condições, troca e financiamento pelo WhatsApp.'
+     ].filter(Boolean).join('\n');
+   }
+   return [
+     title,
+     d.precoFmt ? d.precoFmt : '',
+     '',
+     specs.length ? specs.map(x=>`• ${x}`).join('\n') : '',
+     d.destaque ? `\n⭐ ${d.destaque}` : '',
+     opts.length ? `\nOpcionais e diferenciais:\n${opts.map(x=>`• ${x}`).join('\n')}` : '',
+     d.desc ? `\n${d.desc}` : '',
+     '\n📲 Entre em contato para consultar condições, troca e financiamento.'
+   ].filter(Boolean).join('\n');
+ }
+
+ function generateAdMode(mode){
+   $('vAnuncio').value=buildAd(mode);
+   window.__zezonesAdMode=mode;
+   $('vAnuncio').focus();
+ }
+ $('generateWhatsBtn').addEventListener('click',()=>generateAdMode('whatsapp'));
+ $('generateSocialBtn').addEventListener('click',()=>generateAdMode('social'));
+ $('generateOlxBtn').addEventListener('click',()=>generateAdMode('olx'));
+ $('copyAdBtn').addEventListener('click',async()=>{
+   const box=$('vAnuncio');
+   if(!box.value.trim()) box.value=buildAd('whatsapp');
+   try{
+     await navigator.clipboard.writeText(box.value);
+     const b=$('copyAdBtn'), old=b.textContent;
+     b.textContent='✅ Copiado!';
+     setTimeout(()=>b.textContent=old,1500);
+   }catch(e){
+     box.focus(); box.select();
+     document.execCommand('copy');
+     const b=$('copyAdBtn'), old=b.textContent;
+     b.textContent='✅ Copiado!';
+     setTimeout(()=>b.textContent=old,1500);
+   }
+ });
+ $('clearAdBtn2').addEventListener('click',()=>{
+   $('vAnuncio').value='';
+   $('vAnuncio').focus();
+ });
+
+ $('vehicleForm').addEventListener('submit',async e=>{
+   e.preventDefault(); const msg=$('vehicleMsg'),btn=$('saveVehicleBtn'); msg.style.display='none';btn.disabled=true;btn.textContent='Salvando...';
+   try{
+     const {data:{user}}=await window.zClient.auth.getUser(); if(!user)throw new Error('Sua sessão expirou. Faça login novamente.');
+     const row={user_id:user.id,marca:$('vMarca').value.trim(),modelo:$('vModelo').value.trim(),versao:$('vVersao').value.trim()||null,
+       ano_fabricacao:$('vFab').value?Number($('vFab').value):null,ano_modelo:$('vMod').value?Number($('vMod').value):null,
+       quilometragem:$('vKm').value?Number($('vKm').value):null,preco:$('vPreco').value?Number($('vPreco').value):null,
+       combustivel:$('vComb').value||null,cambio:$('vCambio').value||null,cor:$('vCor').value.trim()||null,
+       descricao:$('vDescricao').value.trim()||null,destaque:$('vDestaque').value.trim()||null,whatsapp:$('vWhatsapp').value.trim()||null,placa:$('vPlaca').value.trim().toUpperCase()||null,status:'ativo'};
+     let result;
+     if(editingVehicleId){
+       const {user_id,...updateRow}=row;
+       result=await window.zClient.from('veiculos').update(updateRow).eq('id',editingVehicleId).eq('user_id',user.id);
+     }else{
+       result=await window.zClient.from('veiculos').insert(row);
+     }
+     if(result.error)throw result.error;
+     msg.className='msg ok';msg.textContent=editingVehicleId?'Alterações salvas com sucesso!':'Veículo salvo com sucesso!';msg.style.display='block';
+     $('vehicleForm').reset();editingVehicleId=null;window.__zezonesDescVariant=0;$('saveVehicleBtn').textContent='Salvar veículo';await loadVehicles();
+   }catch(err){msg.className='msg error';msg.textContent='Não foi possível salvar: '+(err.message||'erro desconhecido');msg.style.display='block';}
+   finally{btn.disabled=false;btn.textContent='Salvar veículo';}
+ });
+ window.addEventListener('zezones-dashboard-open',loadVehicles);
+ window.zezonesLoadVehicles=loadVehicles;
+})();
+
+(function(){
+  const panel=document.getElementById('integrationsPanel');
+  const openBtn=document.getElementById('integrationsBtn');
+  const closeBtn=document.getElementById('closeIntegrationsBtn');
+  const modal=document.getElementById('integrationModal');
+  const modalTitle=document.getElementById('integrationModalTitle');
+  const modalText=document.getElementById('integrationModalText');
+  const closeModal=document.getElementById('closeIntegrationModal');
+  const ok=document.getElementById('integrationModalOk');
+  function openPanel(){
+    ['vehiclePanel','photoPanel','artPanel'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
+    if(panel) panel.style.display='block';
+    panel?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function closePanel(){if(panel)panel.style.display='none';}
+  function openModal(kind){
+    if(!modal)return;
+    const data={
+      instagram:{title:'Conectar Instagram',text:'Primeiro vamos preparar a conexão com uma conta profissional do Instagram usando a infraestrutura da Meta.'},
+      facebook:{title:'Conectar Facebook',text:'Primeiro vamos preparar a conexão com sua Página do Facebook para usar o painel como central de publicação.'},
+      marketplace:{title:'Preparar Marketplace',text:'O fluxo do Marketplace fica separado porque a disponibilidade de publicação depende dos recursos e permissões liberados pela Meta para a conta.'}
+    }[kind];
+    modalTitle.textContent=data.title; modalText.textContent=data.text; modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+  }
+  openBtn?.addEventListener('click',openPanel); closeBtn?.addEventListener('click',closePanel);
+  const INSTAGRAM_AUTH_URL='https://lutsmfywwosgdgerqdwt.supabase.co/functions/v1/instagram-auth';
+  async function checkInstagramConnection(){
+    const statusEl=document.getElementById('instagramStatus');
+    const btn=document.getElementById('connectInstagramBtn');
+    if(!statusEl || !btn) return;
+    try{
+      const r=await fetch(INSTAGRAM_AUTH_URL+'?status=1',{cache:'no-store'});
+      const data=await r.json();
+      if(data.connected){
+        statusEl.textContent='Conectado';
+        statusEl.classList.remove('pending');
+        statusEl.classList.add('connected');
+        btn.textContent='Conectado';
+        btn.disabled=true;
+      }else{
+        statusEl.textContent='Não conectado';
+        statusEl.classList.remove('connected');
+        statusEl.classList.add('pending');
+        btn.textContent='Conectar';
+        btn.disabled=false;
+      }
+    }catch(e){
+      console.warn('Não foi possível verificar o Instagram:',e);
+    }
+  }
+  document.getElementById('connectInstagramBtn')?.addEventListener('click',()=>{ window.location.href=INSTAGRAM_AUTH_URL; });
+  checkInstagramConnection();
+  document.getElementById('connectFacebookBtn')?.addEventListener('click',()=>openModal('facebook'));
+  document.getElementById('connectMarketplaceBtn')?.addEventListener('click',()=>openModal('marketplace'));
+  function hideModal(){modal?.classList.remove('show');modal?.setAttribute('aria-hidden','true');}
+  closeModal?.addEventListener('click',hideModal); ok?.addEventListener('click',hideModal);
+  modal?.addEventListener('click',e=>{if(e.target===modal)hideModal();});
+})();
+
+</script>
+</body>
+</html>
