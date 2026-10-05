@@ -144,8 +144,6 @@ function render(list=vehicles){
   }).join('');
 }
 function openVehicle(id){ location.href='/veiculo/?id='+encodeURIComponent(id); }
-document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 document.getElementById('search').addEventListener('input',e=>{const q=e.target.value.toLowerCase().trim();render(vehicles.filter(v=>(v.marca+' '+v.modelo+' '+(v.versao||'')).toLowerCase().includes(q)))});
 
 (async()=>{
