@@ -292,7 +292,26 @@ $("form").addEventListener("submit",async e=>{
 
 <div id="dashboardPage" style="display:none;min-height:100vh;background:#0b0b0d;color:#f5f5f5;font-family:Arial,sans-serif;">
 <style>
-#dashboardPage *{box-sizing:border-box}.dash-header{height:88px;border-bottom:1px solid #29292d;display:flex;align-items:center;justify-content:space-between;padding:0 38px;background:#111114}.brand-mini{display:flex;align-items:center;gap:14px;height:100%}.brand-mini img{width:356px;height:124px;object-fit:contain;object-position:left center;background:transparent;border-radius:0;padding:0}.brand-mini strong{display:block;letter-spacing:3px;font-size:15px}.brand-mini span{display:block;color:#777;font-size:11px;margin-top:4px;letter-spacing:1px}.dash-main{max-width:1250px;margin:0 auto;padding:42px 28px}.eyebrow{font-size:12px;color:#c99a52;letter-spacing:3px;text-transform:uppercase}.dash-title{font-size:38px;margin:9px 0 7px}.dash-sub{color:#96969c;margin:0 0 30px;font-size:16px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}.stat{background:#151519;border:1px solid #29292d;border-radius:14px;padding:20px}.stat-label{color:#888;font-size:13px}.stat-num{font-size:31px;font-weight:700;margin-top:10px}.panel{background:#151519;border:1px solid #29292d;border-radius:16px;padding:26px}.panel h2{margin:0 0 18px;font-size:22px}.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.quick button{margin:0;text-align:left;background:#1b1b20;border:1px solid #35353a;border-radius:12px;padding:20px;color:#fff;cursor:pointer}.quick button:hover{border-color:#c99a52}.quick .ico{font-size:25px;margin-bottom:10px}.quick b{font-size:15px}.quick small{display:block;color:#888;margin-top:6px;line-height:1.4}#vehiclePanel{display:none;margin-top:24px}.vehicle-form-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid #29292d}.vehicle-form-head h2{margin:0 0 6px}.vehicle-form-head p{margin:0;color:#888;font-size:13px;line-height:1.5}.form-badge{white-space:nowrap;border:1px solid #4a4030;color:#c99a52;background:#1b1813;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.5px}.form-section{margin-top:22px}.form-section-title{display:flex;align-items:center;gap:9px;color:#fff;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px}.form-section-title:before{content:"";width:4px;height:16px;border-radius:4px;background:#c99a52}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.field{position:relative}.field label{display:block;color:#c7c7cb;font-size:13px;margin:0 0 7px}.field input,.field select,.field textarea{width:100%;padding:13px;border-radius:9px;border:1px solid #303035;background:#19191c;color:#fff;font-size:14px;outline:none;transition:.15s}.field input:hover,.field select:hover,.field textarea:hover{border-color:#44444a}.field input:focus,.field select:focus,.field textarea:focus{border-color:#c69a5b;box-shadow:0 0 0 3px rgba(201,154,82,.08)}.field textarea{min-height:120px;resize:vertical}.desc-tools{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 8px}.basic-options{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;margin:7px 0 9px}
+#dashboardPage *{box-sizing:border-box}
+.dash-layout{display:grid;grid-template-columns:235px minmax(0,1fr);min-height:100vh}
+.dash-sidebar{position:sticky;top:0;height:100vh;background:#111114;border-right:1px solid #29292d;padding:25px 15px;display:flex;flex-direction:column}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:4px 10px 25px;border-bottom:1px solid #29292d;margin-bottom:18px}
+.sidebar-brand img{width:42px;height:48px;object-fit:contain}
+.sidebar-brand strong{display:block;font-size:11px;letter-spacing:2px}
+.sidebar-brand span{display:block;color:#777;font-size:9px;margin-top:4px;letter-spacing:.8px}
+.sidebar-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:2px;padding:0 11px 9px}
+.sidebar-nav{display:flex;flex-direction:column;gap:5px}
+.sidebar-nav button{width:100%;display:flex;align-items:center;gap:11px;text-align:left;background:transparent;border:1px solid transparent;color:#aaa;padding:12px 11px;border-radius:9px;cursor:pointer;font-size:13px}
+.sidebar-nav button:hover,.sidebar-nav button.active{background:#1b1b20;border-color:#303036;color:#fff}
+.sidebar-nav .nav-ico{width:22px;text-align:center;font-size:16px}
+.sidebar-footer{margin-top:auto;padding-top:15px;border-top:1px solid #29292d}
+.sidebar-footer button{width:100%;margin:0!important}
+.dash-content{min-width:0}
+.dash-header{height:70px;border-bottom:1px solid #29292d;display:flex;align-items:center;justify-content:flex-end;padding:0 28px;background:#0f0f12}
+.brand-mini{display:none}
+.dash-main{max-width:1250px;margin:0 auto;padding:42px 28px}
+@media(max-width:900px){.dash-layout{grid-template-columns:82px minmax(0,1fr)}.sidebar-brand{justify-content:center;padding:4px 0 20px}.sidebar-brand div,.sidebar-label,.sidebar-nav button span:last-child{display:none}.sidebar-nav button{justify-content:center;padding:12px 5px}.sidebar-footer button{font-size:0}.sidebar-footer button:after{content:'↪';font-size:16px}.dash-main{padding:32px 20px}}
+@media(max-width:520px){.dash-layout{grid-template-columns:1fr}.dash-sidebar{position:sticky;height:auto;z-index:10;padding:10px;border-right:0;border-bottom:1px solid #29292d}.sidebar-brand,.sidebar-label,.sidebar-footer{display:none}.sidebar-nav{display:grid;grid-template-columns:repeat(3,1fr)}.sidebar-nav button span:last-child{display:block;font-size:10px}.sidebar-nav button{justify-content:center;flex-direction:column;gap:4px;padding:8px 4px}.dash-header{display:none}.dash-main{padding:24px 15px}}.brand-mini{display:flex;align-items:center;gap:14px;height:100%}.brand-mini img{width:356px;height:124px;object-fit:contain;object-position:left center;background:transparent;border-radius:0;padding:0}.brand-mini strong{display:block;letter-spacing:3px;font-size:15px}.brand-mini span{display:block;color:#777;font-size:11px;margin-top:4px;letter-spacing:1px}.dash-main{max-width:1250px;margin:0 auto;padding:42px 28px}.eyebrow{font-size:12px;color:#c99a52;letter-spacing:3px;text-transform:uppercase}.dash-title{font-size:38px;margin:9px 0 7px}.dash-sub{color:#96969c;margin:0 0 30px;font-size:16px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}.stat{background:#151519;border:1px solid #29292d;border-radius:14px;padding:20px}.stat-label{color:#888;font-size:13px}.stat-num{font-size:31px;font-weight:700;margin-top:10px}.panel{background:#151519;border:1px solid #29292d;border-radius:16px;padding:26px}.panel h2{margin:0 0 18px;font-size:22px}.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.quick button{margin:0;text-align:left;background:#1b1b20;border:1px solid #35353a;border-radius:12px;padding:20px;color:#fff;cursor:pointer}.quick button:hover{border-color:#c99a52}.quick .ico{font-size:25px;margin-bottom:10px}.quick b{font-size:15px}.quick small{display:block;color:#888;margin-top:6px;line-height:1.4}#vehiclePanel{display:none;margin-top:24px}.vehicle-form-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid #29292d}.vehicle-form-head h2{margin:0 0 6px}.vehicle-form-head p{margin:0;color:#888;font-size:13px;line-height:1.5}.form-badge{white-space:nowrap;border:1px solid #4a4030;color:#c99a52;background:#1b1813;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.5px}.form-section{margin-top:22px}.form-section-title{display:flex;align-items:center;gap:9px;color:#fff;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:12px}.form-section-title:before{content:"";width:4px;height:16px;border-radius:4px;background:#c99a52}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.field{position:relative}.field label{display:block;color:#c7c7cb;font-size:13px;margin:0 0 7px}.field input,.field select,.field textarea{width:100%;padding:13px;border-radius:9px;border:1px solid #303035;background:#19191c;color:#fff;font-size:14px;outline:none;transition:.15s}.field input:hover,.field select:hover,.field textarea:hover{border-color:#44444a}.field input:focus,.field select:focus,.field textarea:focus{border-color:#c69a5b;box-shadow:0 0 0 3px rgba(201,154,82,.08)}.field textarea{min-height:120px;resize:vertical}.desc-tools{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 8px}.basic-options{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;margin:7px 0 9px}
 .desc-tools button{min-width:120px}.desc-tools{gap:7px}
 .basic-options label{display:flex!important;align-items:center!important;gap:6px!important;width:auto!important;margin:0!important;font-size:12px!important;color:#bbb!important;white-space:nowrap}
 .basic-options input{margin:0!important;width:16px!important;height:16px!important;flex:0 0 auto}
@@ -303,7 +322,22 @@ $("form").addEventListener("submit",async e=>{
 .desc-tools .desc-primary{background:#c99a52;color:#111;border-color:#c99a52}
 .desc-mode{font-size:11px;color:#777;margin:0 0 8px}.ad-copy-success{font-size:11px;color:#c99a52;margin-left:4px}.field-hint{display:block;color:#666;font-size:11px;margin-top:6px}.full{grid-column:1/-1}.form-actions{display:flex;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid #29292d}.primary{background:#c99a52!important;color:#111!important;border:0!important;padding:13px 22px!important;border-radius:9px!important;font-weight:700;cursor:pointer}.secondary{background:transparent!important;color:#bbb!important;border:1px solid #3a3a3f!important;padding:13px 22px!important;border-radius:9px!important;cursor:pointer}#vehicleMsg{display:none;margin-top:14px;padding:12px;border-radius:9px;font-size:14px}.list-panel{margin-top:24px}.vehicle-row{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #29292d}.vehicle-row:last-child{border-bottom:0}.vehicle-title{font-weight:700}.vehicle-meta{color:#888;font-size:13px;margin-top:4px}.vehicle-plate{color:#c99a52;font-weight:700;letter-spacing:.4px}.catalog-panel{margin-top:24px}.catalog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:18px}.catalog-head h2{margin:0 0 6px}.catalog-head p{margin:0;color:#888;font-size:13px}.catalog-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.catalog-card{background:#1a1a1f;border:1px solid #2d2d33;border-radius:14px;overflow:hidden}.catalog-photo{width:100%;height:190px;object-fit:cover;display:block;background:#111}.catalog-body{padding:16px}.catalog-title{font-size:17px;font-weight:800}.catalog-meta{color:#888;font-size:12px;margin-top:5px}.catalog-price{font-size:19px;font-weight:800;color:#c99a52;margin-top:10px}.catalog-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}.catalog-actions button{width:auto!important;margin:0!important;padding:9px 11px!important;font-size:11px!important}.catalog-empty{padding:28px;color:#888;text-align:center;border:1px dashed #333;border-radius:12px}@media(max-width:900px){.catalog-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.catalog-grid{grid-template-columns:1fr}.brand-mini img{width:300px;height:104px}.logo{width:356px;height:124px}}@media(max-width:800px){.stats,.quick{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.dash-header{padding:0 18px}.vehicle-form-head{flex-direction:column}.form-badge{align-self:flex-start}}@media(max-width:520px){.stats,.quick{grid-template-columns:1fr}.dash-main{padding:28px 16px}.dash-title{font-size:31px}.form-actions{flex-direction:column}.form-actions button{width:100%}}
 </style>
-<header class="dash-header"><div class="brand-mini"><img src="../assets/zezones-logo-shield.svg" alt="Zézones Consulting"></div><button id="logoutBtn" class="secondary" style="margin:0;">Sair</button></header>
+<div class="dash-layout">
+<aside class="dash-sidebar">
+  <div class="sidebar-brand"><img src="../assets/zezones-logo-shield.svg" alt="Zézones Consulting"><div><strong>ZÉZONES CONSULTING</strong><span>PAINEL AUTOMOTIVO</span></div></div>
+  <div class="sidebar-label">Menu</div>
+  <nav class="sidebar-nav">
+    <button type="button" class="active" id="sideDashboard"><span class="nav-ico">⌂</span><span>Dashboard</span></button>
+    <button type="button" id="sideVehicle"><span class="nav-ico">🚗</span><span>Cadastrar veículo</span></button>
+    <button type="button" id="sideVehicles"><span class="nav-ico">📋</span><span>Meus veículos</span></button>
+    <button type="button" id="sideArt"><span class="nav-ico">🖼️</span><span>Gerar arte</span></button>
+    <button type="button" id="sideIntegrations"><span class="nav-ico">🔗</span><span>Integrações</span></button>
+    <button type="button" id="sideCatalog"><span class="nav-ico">🗂️</span><span>Catálogo</span></button>
+  </nav>
+  <div class="sidebar-footer"><button id="logoutBtn" class="secondary">Sair</button></div>
+</aside>
+<div class="dash-content">
+<header class="dash-header"></header>
 <main class="dash-main">
 <div class="eyebrow">Visão geral</div><h1 class="dash-title">Olá, Zézones.</h1><p class="dash-sub">Seu estoque, seus anúncios e seu controle em um só lugar.</p>
 <section class="stats"><div class="stat"><div class="stat-label">Veículos</div><div class="stat-num" id="statVehicles">0</div></div><div class="stat"><div class="stat-label">Anúncios ativos</div><div class="stat-num" id="statActive">0</div></div><div class="stat"><div class="stat-label">Fotos</div><div class="stat-num">0</div></div><div class="stat"><div class="stat-label">Leads</div><div class="stat-num">0</div></div></section>
@@ -514,6 +548,9 @@ $("form").addEventListener("submit",async e=>{
 
 <section class="panel list-panel"><h2>Meus veículos</h2><div id="vehicleList"><div style="color:#888;">Carregando...</div></div></section>
 </main></div>
+</div>
+
+
 
 
 
@@ -1371,6 +1408,20 @@ $("form").addEventListener("submit",async e=>{
   modal?.addEventListener('click',e=>{if(e.target===modal)hideModal();});
 })();
 
+</script>
+<script>
+(function(){
+  const nav=[...document.querySelectorAll('.sidebar-nav button')];
+  const activate=id=>nav.forEach(x=>x.classList.toggle('active',x.id===id));
+  const bind=(sideId,targetId)=>{
+    const a=document.getElementById(sideId), b=document.getElementById(targetId);
+    if(a&&b) a.addEventListener('click',()=>{activate(sideId);b.click();});
+  };
+  const dash=document.getElementById('sideDashboard');
+  if(dash) dash.addEventListener('click',()=>{activate('sideDashboard');window.scrollTo({top:0,behavior:'smooth'});});
+  bind('sideVehicle','openVehicleBtn'); bind('sideVehicles','myVehiclesBtn'); bind('sideArt','artBtn');
+  bind('sideIntegrations','integrationsBtn'); bind('sideCatalog','catalogBtn');
+})();
 </script>
 </body>
 </html>
