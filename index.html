@@ -1021,14 +1021,14 @@ $("form").addEventListener("submit",async e=>{
          ctx.fillText(shown,bx+(story?45:40),by+(story?31:27));
        }
 
-       const years=(v.ano_fabricacao&&v.ano_modelo)?`${v.ano_fabricacao}/${v.ano_modelo}`:(v.ano_modelo||'');
-       const km=v.quilometragem!=null?Number(v.quilometragem).toLocaleString('pt-BR')+' km':'';
-       const price=v.preco!=null?Number(v.preco).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'';
+       const captionYears=(v.ano_fabricacao&&v.ano_modelo)?`${v.ano_fabricacao}/${v.ano_modelo}`:(v.ano_modelo||'');
+       const captionKm=v.quilometragem!=null?Number(v.quilometragem).toLocaleString('pt-BR')+' km':'';
+       const captionPrice=v.preco!=null?Number(v.preco).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'';
        const title=[v.marca,v.modelo,v.versao].filter(Boolean).join(' ');
        const instagramCaption=[
          `🚗 ${title}`,
-         [years,km].filter(Boolean).join(' • '),
-         price ? `💰 ${price}` : '',
+         [captionYears,captionKm].filter(Boolean).join(' • '),
+         captionPrice ? `💰 ${captionPrice}` : '',
          v.destaque ? `\n${v.destaque}` : '',
          v.descricao ? `\n${v.descricao}` : '',
          '\n📲 Consulte condições, troca e financiamento pelo WhatsApp.'
