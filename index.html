@@ -136,7 +136,7 @@ function render(list=vehicles){
       '<div class="badge">DISPONÍVEL</div></div>'+
       '<div class="card-body"><h3>'+esc(v.marca)+' '+esc(v.modelo)+'</h3>'+
       '<div class="version">'+esc(v.versao||'')+'</div>'+
-      '<div class="meta"><span>'+esc(v.ano_modelo||v.ano_fabricacao||'')+'</span><span>'+km(v.quilometragem)+'</span><span>'+esc(v.cambio||'')}</span></div>'+
+      '<div class="meta"><span>'+esc(v.ano_modelo||v.ano_fabricacao||'')+'</span><span>'+km(v.quilometragem)+'</span><span>'+esc(v.cambio||'')+'</span></div>'+
       '<div class="price">'+money(v.preco)+'</div></div></article>';
   }).join('');
 }
