@@ -177,6 +177,12 @@ $("form").addEventListener("submit",async e=>{
   const publicId = new URLSearchParams(location.search).get('veiculo');
   if(!publicId) return;
 
+  // Links antigos do painel agora redirecionam para o catálogo público principal.
+  if(location.pathname.startsWith('/login/')){
+    location.replace(new URL('/?veiculo='+encodeURIComponent(publicId), window.location.origin).toString());
+    return;
+  }
+
   document.querySelector('.wrap').style.display='none';
   const dash=document.getElementById('dashboardPage'); if(dash) dash.style.display='none';
   const page=document.getElementById('publicPage'); page.style.display='block';
@@ -692,11 +698,7 @@ $("form").addEventListener("submit",async e=>{
  initPhotoLightbox();
 
  function copyPublicLink(vehicleId){
-   const url = new URL(location.href);
-   url.search = '';
-   url.hash = '';
-   url.searchParams.set('veiculo', vehicleId);
-   const publicUrl = url.toString();
+   const publicUrl = new URL('/?veiculo='+encodeURIComponent(vehicleId), window.location.origin).toString();
    try { navigator.clipboard.writeText(publicUrl); } catch(e) {}
    const opened = window.open(publicUrl, '_blank');
    if (!opened) {
