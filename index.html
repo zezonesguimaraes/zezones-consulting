@@ -54,11 +54,11 @@ footer{display:flex;align-items:center;justify-content:space-between;border-top:
 .modal-box{width:min(1050px,100%);margin:20px auto;background:#121215;border:1px solid #343238;border-radius:22px;overflow:hidden}
 .modal-top{display:flex;justify-content:space-between;gap:20px;padding:20px 24px;border-bottom:1px solid #29272c}
 .close{border:0;background:#26242a;color:#fff;width:38px;height:38px;border-radius:10px;font-size:22px;cursor:pointer}
-.detail{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);min-width:0}
-.gallery{padding:22px;min-width:0;overflow:hidden}
+.detail{display:grid;grid-template-columns:1.1fr .9fr}
+.gallery{padding:22px}
 .main-photo{height:430px;border-radius:15px;overflow:hidden;background:#1b1a1e}
 .main-photo img{width:100%;height:100%;object-fit:cover}
-.thumbs{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;margin-top:10px;min-width:0;max-width:100%;padding-bottom:2px}
+.thumbs{display:flex;gap:8px;overflow:auto;margin-top:10px}
 .thumbs img{width:74px;height:56px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent}
 .info{padding:28px;border-left:1px solid #29272c}
 .info h2{font-size:34px;margin:0 0 8px}
@@ -113,6 +113,13 @@ footer{display:flex;align-items:center;justify-content:space-between;border-top:
   </footer>
 </div>
 
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="modal-box">
+    <div class="modal-top"><div id="modalTitle"></div><button class="close" onclick="closeModal()">×</button></div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL='https://lutsmfywwosgdgerqdwt.supabase.co';
 const SUPABASE_KEY='sb_publishable_hSr74EjhekAqzrwALv96ZQ_q_T3c3hh';
@@ -143,7 +150,32 @@ function render(list=vehicles){
       '<div class="price">'+money(v.preco)+'</div></div></article>';
   }).join('');
 }
-function openVehicle(id){ location.href='/veiculo/?id='+encodeURIComponent(id); }
+function openVehicle(id){
+  const v=vehicles.find(x=>x.id===id); if(!v)return;
+  const photos=(photosByVehicle[id]||[]).slice().sort((a,b)=>(a.ordem||0)-(b.ordem||0));
+  const first=photos[0]?.url||'';
+  document.getElementById('modalTitle').innerHTML='<div><div class="kicker">'+esc(v.marca)+'</div></div>';
+  document.getElementById('modalContent').innerHTML=
+    '<div class="detail"><div class="gallery">'+
+      '<div class="main-photo">'+(first?'<img id="mainPhoto" src="'+esc(first)+'" alt="">':'<div class="no-photo">Sem fotos disponíveis</div>')+'</div>'+
+      '<div class="thumbs">'+photos.map(p=>'<img src="'+esc(p.url)+'" onclick="document.getElementById(\'mainPhoto\').src=this.src" alt="">').join('')+'</div>'+
+    '</div><div class="info"><h2>'+esc(v.marca+' '+v.modelo)+'</h2>'+
+      '<div class="sub">'+esc(v.versao||'')+'</div>'+
+      '<div class="price">'+money(v.preco)+'</div>'+
+      '<div class="specs">'+
+        spec('Ano',v.ano_modelo||v.ano_fabricacao)+spec('Quilometragem',km(v.quilometragem))+spec('Câmbio',v.cambio)+spec('Combustível',v.combustivel)+spec('Cor',v.cor)+
+      '</div>'+
+      (v.descricao?'<div class="desc">'+esc(v.descricao)+'</div>':'')+
+      (v.whatsapp?'<a class="whats" target="_blank" rel="noopener" href="https://wa.me/'+String(v.whatsapp).replace(/\D/g,'')+'">Falar no WhatsApp</a>':'')+
+    '</div></div>';
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('modal').setAttribute('aria-hidden','false');
+  history.replaceState(null,'','?veiculo='+encodeURIComponent(id));
+}
+function spec(k,v){return '<div class="spec"><small>'+esc(k)+'</small><b>'+esc(v||'—')+'</b></div>'}
+function closeModal(){document.getElementById('modal').classList.remove('open');document.getElementById('modal').setAttribute('aria-hidden','true');history.replaceState(null,'','/')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 document.getElementById('search').addEventListener('input',e=>{const q=e.target.value.toLowerCase().trim();render(vehicles.filter(v=>(v.marca+' '+v.modelo+' '+(v.versao||'')).toLowerCase().includes(q)))});
 
 (async()=>{
