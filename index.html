@@ -54,11 +54,11 @@ footer{display:flex;align-items:center;justify-content:space-between;border-top:
 .modal-box{width:min(1050px,100%);margin:20px auto;background:#121215;border:1px solid #343238;border-radius:22px;overflow:hidden}
 .modal-top{display:flex;justify-content:space-between;gap:20px;padding:20px 24px;border-bottom:1px solid #29272c}
 .close{border:0;background:#26242a;color:#fff;width:38px;height:38px;border-radius:10px;font-size:22px;cursor:pointer}
-.detail{display:grid;grid-template-columns:1.1fr .9fr}
-.gallery{padding:22px}
+.detail{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);min-width:0}
+.gallery{padding:22px;min-width:0;overflow:hidden}
 .main-photo{height:430px;border-radius:15px;overflow:hidden;background:#1b1a1e}
 .main-photo img{width:100%;height:100%;object-fit:cover}
-.thumbs{display:flex;gap:8px;overflow:auto;margin-top:10px}
+.thumbs{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;margin-top:10px;min-width:0;max-width:100%;padding-bottom:2px}
 .thumbs img{width:74px;height:56px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent}
 .info{padding:28px;border-left:1px solid #29272c}
 .info h2{font-size:34px;margin:0 0 8px}
