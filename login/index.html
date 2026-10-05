@@ -179,7 +179,7 @@ $("form").addEventListener("submit",async e=>{
 
   // Links antigos do painel agora redirecionam para o catálogo público principal.
   if(location.pathname.startsWith('/login/')){
-    location.replace(new URL('/?veiculo='+encodeURIComponent(publicId), window.location.origin).toString());
+    location.replace(new URL('/veiculo/?id='+encodeURIComponent(publicId), window.location.origin).toString());
     return;
   }
 
@@ -698,7 +698,7 @@ $("form").addEventListener("submit",async e=>{
  initPhotoLightbox();
 
  function copyPublicLink(vehicleId){
-   const publicUrl = new URL('/?veiculo='+encodeURIComponent(vehicleId), window.location.origin).toString();
+   const publicUrl = new URL('/veiculo/?id='+encodeURIComponent(vehicleId), window.location.origin).toString();
    try { navigator.clipboard.writeText(publicUrl); } catch(e) {}
    const opened = window.open(publicUrl, '_blank');
    if (!opened) {
