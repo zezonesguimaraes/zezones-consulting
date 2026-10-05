@@ -1,1 +1,47 @@
-<!doctype html><html><body>teste</body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zézones Consulting | Veículo</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#09090b;color:#fff;font-family:Arial,Helvetica,sans-serif}a{text-decoration:none;color:inherit}.wrap{width:min(1180px,94vw);margin:auto}
+.top{height:82px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #242228}.brand{display:flex;align-items:center;gap:12px}.brand img{width:40px;height:48px;object-fit:contain}.brand strong{display:block;font-size:12px;letter-spacing:2.5px}.brand span{display:block;color:#77747d;font-size:10px;letter-spacing:1.5px;margin-top:5px}
+.back{border:1px solid #39363d;background:#151518;color:#ddd;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700}.page{padding:34px 0 55px}.loading,.empty{text-align:center;padding:70px 20px;color:#8d8991}
+.vehicle{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:34px;align-items:start}.kicker{color:#c99a52;font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase}.gallery{min-width:0}
+.main-photo{width:100%;height:min(610px,56vw);min-height:360px;background:#151519;border:1px solid #2a282e;border-radius:18px;overflow:hidden}.main-photo img{width:100%;height:100%;display:block;object-fit:cover}.no-photo{height:100%;display:grid;place-items:center;color:#77747d}
+.thumbs{display:flex;gap:9px;overflow-x:auto;padding:11px 1px 5px}.thumbs img{flex:0 0 auto;width:82px;height:62px;object-fit:cover;border-radius:9px;border:2px solid transparent;cursor:pointer}.thumbs img.active{border-color:#c99a52}
+.info{padding:8px 0}.info h1{font-size:clamp(34px,4vw,52px);line-height:1.02;letter-spacing:-1.8px;margin:12px 0 7px}.sub{font-size:20px;color:#9b979f;margin-bottom:22px}.price{font-size:31px;font-weight:800;margin-bottom:25px}
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:11px}.spec{background:#151519;border:1px solid #242229;border-radius:12px;padding:15px}.spec small{display:block;color:#77747d;font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}.spec b{font-size:15px}.desc{color:#aaa6ae;line-height:1.65;white-space:pre-line;margin-top:22px}.whats{display:block;text-align:center;margin-top:25px;padding:16px;border-radius:12px;background:#c99a52;color:#111;font-weight:800}footer{border-top:1px solid #252329;padding:25px 0 35px;color:#77747c;font-size:11px}
+@media(max-width:850px){.vehicle{grid-template-columns:1fr;gap:22px}.main-photo{height:62vw;min-height:300px;max-height:520px}.info{padding:0 2px}}
+@media(max-width:560px){.top{height:74px}.brand img{width:34px;height:42px}.brand strong{font-size:10px}.brand span{font-size:8px}.back{padding:9px 11px;font-size:12px}.page{padding:20px 0 42px}.main-photo{height:78vw;min-height:270px;border-radius:14px}.thumbs img{width:76px;height:57px}.info h1{font-size:35px;letter-spacing:-1px}.sub{font-size:18px}.price{font-size:28px}.specs{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><a class="brand" href="/"><img src="/assets/zezones-logo-shield.svg" alt="Zézones Consulting"><div><strong>ZÉZONES CONSULTING</strong><span>ESTOQUE DE VEÍCULOS</span></div></a><a class="back" href="/">← Voltar ao estoque</a></header>
+<main class="page"><div id="content" class="loading">Carregando veículo...</div></main>
+<footer>ZÉZONES CONSULTING • Gestão e vendas automotivas</footer>
+</div>
+<script>
+const U='https://lutsmfywwosgdgerqdwt.supabase.co',K='sb_publishable_hSr74EjhekAqzrwALv96ZQ_q_T3c3hh',H={apikey:K,Authorization:'Bearer '+K};
+async function api(p){const r=await fetch(U+'/rest/v1/'+p,{headers:H});if(!r.ok)throw Error();return r.json()}
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0})}
+function km(v){return Number(v||0).toLocaleString('pt-BR')+' km'}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function spec(k,v){return '<div class="spec"><small>'+esc(k)+'</small><b>'+esc(v||'—')+'</b></div>'}
+function setPhoto(url,el){document.getElementById('mainPhoto').src=url;document.querySelectorAll('.thumbs img').forEach(x=>x.classList.remove('active'));el.classList.add('active')}
+async function init(){
+ const id=new URLSearchParams(location.search).get('id');if(!id){location.replace('/');return}
+ try{
+  const rows=await api('veiculos?select=id,marca,modelo,versao,ano_fabricacao,ano_modelo,quilometragem,preco,combustivel,cambio,cor,descricao,whatsapp,status&id=eq.'+encodeURIComponent(id)+'&status=eq.ativo');
+  if(!rows.length){document.getElementById('content').innerHTML='<div class="empty">Veículo não encontrado.</div>';return}
+  const v=rows[0],photos=await api('veiculo_fotos?select=url,ordem,destaque&veiculo_id=eq.'+encodeURIComponent(id)+'&order=ordem.asc'),first=photos[0]?.url||'';
+  document.title='Zézones Consulting | '+v.marca+' '+v.modelo;
+  document.getElementById('content').className='';
+  document.getElementById('content').innerHTML='<div class="vehicle"><section class="gallery"><div class="kicker">'+esc(v.marca)+'</div><div class="main-photo" style="margin-top:12px">'+(first?'<img id="mainPhoto" src="'+esc(first)+'" alt="'+esc(v.marca+' '+v.modelo)+'">':'<div class="no-photo">Sem fotos disponíveis</div>')+'</div><div class="thumbs">'+photos.map((p,i)=>'<img class="'+(i===0?'active':'')+'" src="'+esc(p.url)+'" onclick="setPhoto(this.src,this)" alt="">').join('')+'</div></section><section class="info"><h1>'+esc(v.marca+' '+v.modelo)+'</h1><div class="sub">'+esc(v.versao||'')+'</div><div class="price">'+money(v.preco)+'</div><div class="specs">'+spec('Ano',v.ano_modelo||v.ano_fabricacao)+spec('Quilometragem',km(v.quilometragem))+spec('Câmbio',v.cambio)+spec('Combustível',v.combustivel)+spec('Cor',v.cor)+spec('Ano fabricação',v.ano_fabricacao)+'</div>'+(v.descricao?'<div class="desc">'+esc(v.descricao)+'</div>':'')+(v.whatsapp?'<a class="whats" target="_blank" rel="noopener" href="https://wa.me/'+String(v.whatsapp).replace(/\D/g,'')+'">Falar no WhatsApp</a>':'')+'</section></div>';
+ }catch(e){document.getElementById('content').innerHTML='<div class="empty">Não foi possível carregar este veículo agora. Tente novamente.</div>'}
+}
+init();
+</script>
+</body></html>
