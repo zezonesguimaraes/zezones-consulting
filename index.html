@@ -128,6 +128,13 @@ footer{display:flex;align-items:center;justify-content:space-between;border-top:
     <div id="modalContent"></div>
   </div>
 </div>
+<div id="photoLightbox" class="photo-lightbox" aria-hidden="true">
+  <button class="lb-close" type="button" aria-label="Fechar">×</button>
+  <button class="lb-prev" type="button" aria-label="Foto anterior">‹</button>
+  <img id="lightboxPhoto" src="" alt="">
+  <button class="lb-next" type="button" aria-label="Próxima foto">›</button>
+  <div id="lightboxCount" class="lb-count"></div>
+</div>
 
 <script>
 const SUPABASE_URL='https://lutsmfywwosgdgerqdwt.supabase.co';
