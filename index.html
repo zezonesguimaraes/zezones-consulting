@@ -87,7 +87,7 @@ button{width:100%;margin-top:24px;padding:15px;border:0;border-radius:10px;backg
 <body>
 <div class="wrap">
 <section class="brand">
-<div><div class="logo"><img src="assets/zezones-logo-header.jpg" alt="Zézones Consulting"></div><div class="tag">Zézones Consulting</div>
+<div><div class="logo"><img src="assets/zezones-logo-shield.svg" alt="Zézones Consulting"></div><div class="tag">Zézones Consulting</div>
 <h1>Seu estoque.<br>Seu anúncio.<br>Seu controle.</h1>
 <p>Centralize seus veículos, fotos e anúncios em um único sistema.</p></div>
 <div style="color:#666;font-size:12px">Painel de gestão automotiva</div>
@@ -303,7 +303,7 @@ $("form").addEventListener("submit",async e=>{
 .desc-tools .desc-primary{background:#c99a52;color:#111;border-color:#c99a52}
 .desc-mode{font-size:11px;color:#777;margin:0 0 8px}.ad-copy-success{font-size:11px;color:#c99a52;margin-left:4px}.field-hint{display:block;color:#666;font-size:11px;margin-top:6px}.full{grid-column:1/-1}.form-actions{display:flex;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid #29292d}.primary{background:#c99a52!important;color:#111!important;border:0!important;padding:13px 22px!important;border-radius:9px!important;font-weight:700;cursor:pointer}.secondary{background:transparent!important;color:#bbb!important;border:1px solid #3a3a3f!important;padding:13px 22px!important;border-radius:9px!important;cursor:pointer}#vehicleMsg{display:none;margin-top:14px;padding:12px;border-radius:9px;font-size:14px}.list-panel{margin-top:24px}.vehicle-row{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #29292d}.vehicle-row:last-child{border-bottom:0}.vehicle-title{font-weight:700}.vehicle-meta{color:#888;font-size:13px;margin-top:4px}.catalog-panel{margin-top:24px}.catalog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:18px}.catalog-head h2{margin:0 0 6px}.catalog-head p{margin:0;color:#888;font-size:13px}.catalog-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.catalog-card{background:#1a1a1f;border:1px solid #2d2d33;border-radius:14px;overflow:hidden}.catalog-photo{width:100%;height:190px;object-fit:cover;display:block;background:#111}.catalog-body{padding:16px}.catalog-title{font-size:17px;font-weight:800}.catalog-meta{color:#888;font-size:12px;margin-top:5px}.catalog-price{font-size:19px;font-weight:800;color:#c99a52;margin-top:10px}.catalog-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}.catalog-actions button{width:auto!important;margin:0!important;padding:9px 11px!important;font-size:11px!important}.catalog-empty{padding:28px;color:#888;text-align:center;border:1px dashed #333;border-radius:12px}@media(max-width:900px){.catalog-grid{grid-template-columns:1fr 1fr}}@media(max-width:600px){.catalog-grid{grid-template-columns:1fr}.brand-mini img{width:300px;height:104px}.logo{width:356px;height:124px}}@media(max-width:800px){.stats,.quick{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.dash-header{padding:0 18px}.vehicle-form-head{flex-direction:column}.form-badge{align-self:flex-start}}@media(max-width:520px){.stats,.quick{grid-template-columns:1fr}.dash-main{padding:28px 16px}.dash-title{font-size:31px}.form-actions{flex-direction:column}.form-actions button{width:100%}}
 </style>
-<header class="dash-header"><div class="brand-mini"><img src="assets/zezones-logo-header.jpg" alt="Zézones Consulting"></div><button id="logoutBtn" class="secondary" style="margin:0;">Sair</button></header>
+<header class="dash-header"><div class="brand-mini"><img src="assets/zezones-logo-shield.svg" alt="Zézones Consulting"></div><button id="logoutBtn" class="secondary" style="margin:0;">Sair</button></header>
 <main class="dash-main">
 <div class="eyebrow">Visão geral</div><h1 class="dash-title">Olá, Zézones.</h1><p class="dash-sub">Seu estoque, seus anúncios e seu controle em um só lugar.</p>
 <section class="stats"><div class="stat"><div class="stat-label">Veículos</div><div class="stat-num" id="statVehicles">0</div></div><div class="stat"><div class="stat-label">Anúncios ativos</div><div class="stat-num" id="statActive">0</div></div><div class="stat"><div class="stat-label">Fotos</div><div class="stat-num">0</div></div><div class="stat"><div class="stat-label">Leads</div><div class="stat-num">0</div></div></section>
@@ -886,7 +886,7 @@ $("form").addEventListener("submit",async e=>{
  $('myVehiclesBtn').addEventListener('click',()=>document.querySelector('.list-panel').scrollIntoView({behavior:'smooth',block:'start'}));
  $('catalogBtn').addEventListener('click',()=>document.querySelector('#catalogPanel').scrollIntoView({behavior:'smooth',block:'start'}));
 
- const ZEZONES_LOGO = "assets/zezones-logo-header.jpg";
+ const ZEZONES_LOGO = "assets/zezones-logo-shield.svg";
 
  async function openArtPanel(){
    $('artPanel').style.display='block';
