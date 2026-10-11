@@ -12,7 +12,8 @@ const headers = {
 };
 
 function csvCell(value: unknown): string {
-  const text = String(value ?? "").replace(/\r\n?/g, "\n");
+  // Feed descriptions must stay on one physical CSV line for robust importer compatibility.
+  const text = String(value ?? "").replace(/[\r\n\t]+/g, " ").replace(/\s{2,}/g, " ").trim();
   return `"${text.replace(/"/g, '""')}"`;
 }
 
@@ -22,7 +23,7 @@ function csvRow(values: unknown[]): string {
 
 function money(value: unknown): string {
   const amount = Number(value);
-  return Number.isFinite(amount) && amount >= 0 ? `${amount.toFixed(2)} BRL` : "";
+  return Number.isFinite(amount) && amount > 0 ? `${amount.toFixed(2)} BRL` : "";
 }
 
 function vehicleTitle(v: Record<string, unknown>): string {
@@ -54,7 +55,7 @@ function vehicleDescription(v: Record<string, unknown>): string {
 
   if (v.destaque && String(v.destaque).trim()) parts.push(String(v.destaque).trim());
   if (v.descricao && String(v.descricao).trim()) parts.push(String(v.descricao).trim());
-  return parts.join("\n").slice(0, 9999);
+  return parts.join(" | ").slice(0, 5000);
 }
 
 Deno.serve(async (req: Request) => {
