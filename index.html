@@ -78,6 +78,7 @@ footer{display:flex;align-items:center;justify-content:space-between;border-top:
 .spec b{font-size:14px}
 .desc{color:#b0acb3;line-height:1.6;white-space:pre-line}
 .whats{display:block;text-align:center;margin-top:22px;padding:15px;border-radius:12px;background:#c99a52;color:#111;font-weight:800}
+.share-btn{display:block;width:100%;text-align:center;margin-top:22px;padding:14px;border-radius:12px;background:#19181c;border:1px solid #c99a52;color:#e2bd83;font-weight:800;cursor:pointer;font-size:14px}.share-btn:hover{background:#242127}
 @media(max-width:850px){.catalog-head{display:block}.search-wrap{width:100%;margin-top:24px}.grid{grid-template-columns:repeat(2,1fr)}.detail{grid-template-columns:1fr}.info{border-right:0;border-bottom:1px solid #29272c}.gallery{padding-top:20px}}
 @media(max-width:560px){.site-header{height:78px}.header-info{display:none}.brand strong{font-size:11px}.catalog-head{padding:34px 0 20px}.catalog-head h1{font-size:37px}.grid{grid-template-columns:1fr}.catalog-bar span:last-child{display:none}footer{gap:15px}.footer-brand span{font-size:9px}.btn{white-space:nowrap}.main-photo{height:300px}}
 </style>
@@ -182,6 +183,7 @@ function openVehicle(id){
         spec('Ano',v.ano_modelo||v.ano_fabricacao)+spec('Quilometragem',km(v.quilometragem))+spec('Câmbio',v.cambio)+spec('Combustível',v.combustivel)+spec('Cor',v.cor)+
       '</div>'+
       (v.descricao?'<div class="desc">'+esc(v.descricao)+'</div>':'')+
+      '<button class="share-btn" type="button" onclick="shareVehicle(\''+v.id+'\')">Compartilhar anúncio</button>'+
       (v.whatsapp?'<a class="whats" target="_blank" rel="noopener" href="https://wa.me/'+String(v.whatsapp).replace(/\D/g,'')+'">Falar no WhatsApp</a>':'')+
     '</div><section class="gallery"><div class="kicker">'+esc(v.marca)+'</div>'+
       '<div class="main-photo" style="margin-top:12px" onclick="openLightbox(0)">'+(first?'<img id="mainPhoto" src="'+esc(first)+'" alt="'+esc(v.marca+' '+v.modelo)+'">':'<div class="no-photo">Sem fotos disponíveis</div>')+'</div>'+
@@ -228,6 +230,23 @@ function prevPhoto(){
   setMainPhoto(lightboxIndex);
 }
 function spec(k,v){return '<div class="spec"><small>'+esc(k)+'</small><b>'+esc(v||'—')+'</b></div>'}
+async function shareVehicle(id){
+  const v=vehicles.find(x=>x.id===id);
+  if(!v)return;
+  const url=new URL('/?veiculo='+encodeURIComponent(id),'https://www.zezonesconsulting.com.br').href;
+  const title=[v.marca,v.modelo,v.versao].filter(Boolean).join(' ');
+  const data={title:title||'Veículo disponível',text:'Confira este veículo na Zézones Consulting:',url};
+  if(navigator.share){
+    try{await navigator.share(data);return}
+    catch(err){if(err&&err.name==='AbortError')return}
+  }
+  try{
+    await navigator.clipboard.writeText(url);
+    alert('Link do anúncio copiado! Agora é só colar na conversa com seu cliente.');
+  }catch(err){
+    window.prompt('Copie o link do anúncio:',url);
+  }
+}
 function closeModal(){document.getElementById('modal').classList.remove('open');document.getElementById('modal').setAttribute('aria-hidden','true');history.replaceState(null,'','/')}
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
 document.getElementById('photoLightbox').addEventListener('click',e=>{if(e.target.id==='photoLightbox')closeLightbox()});
