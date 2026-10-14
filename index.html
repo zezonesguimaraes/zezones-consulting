@@ -233,7 +233,7 @@ function spec(k,v){return '<div class="spec"><small>'+esc(k)+'</small><b>'+esc(v
 async function shareVehicle(id){
   const v=vehicles.find(x=>x.id===id);
   if(!v)return;
-  const url=new URL('/?veiculo='+encodeURIComponent(id),window.location.origin).href;
+  const url=new URL('/?veiculo='+encodeURIComponent(id),'https://www.zezonesconsulting.com.br').href;
   const title=[v.marca,v.modelo,v.versao].filter(Boolean).join(' ');
   const data={title:title||'Veículo disponível',text:'Confira este veículo na Zézones Consulting:',url};
   if(navigator.share){
